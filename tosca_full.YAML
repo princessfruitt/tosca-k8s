@@ -1,0 +1,33 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+  node_templates:
+    deployment:
+      type: tosca.nodes.Compute
+      capabilities:
+        scalable:
+          min_instances: 1
+          max_instances: 12
+    requarements:
+      - dependency:
+          service:
+            type: tosca.nodes.Compute
+              attributes:
+                private_address: 10.0.171.239
+                public_address: 80.11.12.10
+                ports:
+                  - port_name: http
+                    port_id: 80
+                    addresses: 9376
+      - dependency:
+          pod:
+            type: tosca.nodes.Compute
+            capabilities:
+              host:
+                properties:
+                  num_cpus: 2
+                  cpu_frequency: 0,2 GHz
+                  disk_size: 1 GB
+                  mem_size: 250MB
+              os:
+                properties:
+                  type: polinux
+                  image_distribution: stress
