@@ -1,0 +1,127 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+node_types:
+  kubernetes.nodes.Root:
+    derived_from: tosca.nodes.Root
+  kubernetes.node.Deployment:
+    derived_from: kubernetes.nodes.Root
+    properties:
+      metadata:
+        description:
+        type: kubernetes.datatypes.Metadata
+        required: false
+      spec:
+        type: kubernetes.datatypes.DeploymentSpec
+        required: true
+  kubernetes.node.Pod:
+    derived_from: kubernetes.nodes.Root
+    properties:
+      metadata:
+        description:
+        type: kubernetes.datatypes.Metadata
+        required: false
+      spec:
+        type: kubernetes.datatypes.PodSpec
+        required: true
+
+data_types:
+
+  kubernetes.datatypes.Root:
+    derived_from: tosca.datatypes.Root
+  kubernetes.datatypes.Metadata:
+    derived_from: kubernetes.datatypes.Root
+    properties:
+      label:
+        type: map
+        required: false
+
+  Kubernetes.datatypes.PodSpec:
+    derived_from: kubernetes.datatypes.Root
+    properties:
+      containers:
+        description: List of containers belonging to the pod. Containers cannot currently be added or removed. There must be at least one container in a Pod. Cannot be updated.
+        type: kubernetes.datatypes.Container
+        required: false
+
+  kubernetes.datatypes.Container:
+    derived_from:  kubernetes.datatypes.Root
+    properties:
+      image:
+        description: Docker image name. More info https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.
+        type: string
+        constraints:
+          - pattern: (?<image>.*)\/(?<distribution>.*)\:(?<version>.*)
+      resources:
+        description: Compute Resources required by this container. Cannot be updated.
+        type: kubernetes.datatypes.ResourceRequirements
+        required: false
+      args:
+        description: Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated.
+        type: list
+        entry_schema:
+          type: string
+        required: false
+
+  kubernetes.datatypes.ResourceRequirements:
+    derived_from:  kubernetes.datatypes.Root
+    properties:
+      limits:
+        description: Limits describes the maximum amount of compute resources allowed.
+        type: kubernetes.datatypes.Limits
+        required: false
+
+  kubernetes.datatypes.Limits:
+    derived_from:  kubernetes.datatypes.Root
+    properties:
+      cpu:
+        description: The CPU resource is measured in cpus.
+        type: scalar-unit.frequency
+        constraints:
+          - greater_or_equal: 0.1 GHz
+      memory:
+        description: The RAM resource is measured in bytes.
+        type:  scalar-unit.size
+        constraints:
+          - greater_or_equal: 0 MB
+
+  kubernetes.datatypes.DeploymentSpec:
+    derived_from: kubernetes.datatypes.Root
+    properties:
+      strategy:
+        description: the deployment strategy to use to replace existing pods with new ones.
+        type: kubernetes.datatypes.DeploymentStrategy
+        required: false
+      replicas:
+        description: Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
+        type: integer
+        required: false
+
+  kubernetes.datatypes.DeploymentStrategy:
+    derived_from:  kubernetes.datatypes.Root
+    properties:
+      type:
+        description: Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
+        type: string
+        default: RollingUpdate
+        constraints:
+          - RollingUpdate
+      rollingUpdate:
+        description: Rolling update config params. Present only if DeploymentStrategyType = RollingUpdate.
+        type: kubernetes.datatypes.RollingUpdateDeployment
+        required: true
+
+  kubernetes.datatypes.RollingUpdateDeployment:
+    derived_from:  kubernetes.datatypes.Root
+    properties:
+      maxUnavailable:
+        description: The maximum number of pods that can be unavailable during the update.
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 1
+      maxSurge:
+        description: The maximum number of pods that can be scheduled above the desired number of pods.
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 1
