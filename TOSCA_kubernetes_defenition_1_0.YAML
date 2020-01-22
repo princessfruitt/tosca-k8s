@@ -7,35 +7,84 @@ node_types:
     derived_from: kubernetes.nodes.Root
     properties:
       metadata:
-        description:
+        description: Standard object's metadata.
         type: kubernetes.datatypes.Metadata
         required: false
       spec:
         type: kubernetes.datatypes.DeploymentSpec
-        required: true
+        required: false
   kubernetes.node.Pod:
     derived_from: kubernetes.nodes.Root
     properties:
       metadata:
-        description:
+        description: Standard object's metadata.
         type: kubernetes.datatypes.Metadata
         required: false
       spec:
         type: kubernetes.datatypes.PodSpec
-        required: true
+        required: false
+  kubernetes.node.Service:
+    derived_from: kubernetes.nodes.Root
+    properties:
+      metadata:
+        description: Standard object's metadata.
+        type: kubernetes.datatypes.Metadata
+        required: false
+      spec:
+        type: kubernetes.datatypes.ServiceSpec
+        required: false
 
 data_types:
 
   kubernetes.datatypes.Root:
     derived_from: tosca.datatypes.Root
-  kubernetes.datatypes.Metadata:
+  kubernetes.datatypes.ObjectMeta:
     derived_from: kubernetes.datatypes.Root
     properties:
       label:
         type: map
         required: false
 
-  Kubernetes.datatypes.PodSpec:
+  Kubernetes.datatypes.ServiceSpec:
+    derived_from: kubernetes.datatypes.Root
+    properties:
+      clusterIP:
+        description: clusterIP is the IP address of the service and is usually assigned randomly by the master. If an address is specified manually and is not in use by others, it will be allocated to the service; otherwise, creation of the service will fail. This field can not be changed through updates. Valid values are "None", empty string (""), or a valid IP address. "None" can be specified for headless services when proxying is not required.
+        type: string
+        required: false
+      externalIPs:
+        description: externalIPs is a list of IP addresses for which nodes in the cluster will also accept traffic for this service. These IPs are not managed by Kubernetes. The user is responsible for ensuring that traffic arrives at a node with this IP. A common example is external load-balancers that are not part of the Kubernetes system.
+        type: list
+        entry_schema:
+          type: string
+        required: false
+
+      ports:
+        description: externalIPs is a list of IP addresses for which nodes in the cluster will also accept traffic for this service. These IPs are not managed by Kubernetes. The user is responsible for ensuring that traffic arrives at a node with this IP. A common example is external load-balancers that are not part of the Kubernetes system.
+        type: list
+        entry_schema:
+          type: kubernetes.datatypes.ServicePort
+        required: false
+
+  kubernetes.datatypes.ServicePort:
+    derived_from:  kubernetes.datatypes.Root
+    properties:
+      name:
+        description: The name of this port within the service. This must be a DNS_LABEL. All ports within a ServiceSpec must have unique names. When considering the endpoints for a Service, this must match the 'name' field in the EndpointPort. Optional if only one ServicePort is defined on this service.
+        type: string
+        required: false
+      port:
+        description: The port that will be exposed by this service.
+        type: integer
+        required: false
+      targetPort:
+        description: Number or name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field.
+        type: integer
+        constraints:
+          - in_range: [1, 65535]
+        required: false
+
+  kubernetes.datatypes.PodSpec:
     derived_from: kubernetes.datatypes.Root
     properties:
       containers:
@@ -51,6 +100,7 @@ data_types:
         type: string
         constraints:
           - pattern: (?<image>.*)\/(?<distribution>.*)\:(?<version>.*)
+        required: false
       resources:
         description: Compute Resources required by this container. Cannot be updated.
         type: kubernetes.datatypes.ResourceRequirements
@@ -76,11 +126,13 @@ data_types:
       cpu:
         description: The CPU resource is measured in cpus.
         type: scalar-unit.frequency
+        required: false
         constraints:
           - greater_or_equal: 0.1 GHz
       memory:
         description: The RAM resource is measured in bytes.
         type:  scalar-unit.size
+        required: false
         constraints:
           - greater_or_equal: 0 MB
 
@@ -88,13 +140,16 @@ data_types:
     derived_from: kubernetes.datatypes.Root
     properties:
       strategy:
-        description: the deployment strategy to use to replace existing pods with new ones.
+        description: The deployment strategy to use to replace existing pods with new ones.
         type: kubernetes.datatypes.DeploymentStrategy
         required: false
       replicas:
         description: Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
         type: integer
         required: false
+        default: 1
+        constraints:
+          - greater_or_equal: 0
 
   kubernetes.datatypes.DeploymentStrategy:
     derived_from:  kubernetes.datatypes.Root
