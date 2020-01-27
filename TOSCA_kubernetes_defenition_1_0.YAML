@@ -45,7 +45,7 @@ data_types:
         type: map
         required: false
 
-  Kubernetes.datatypes.ServiceSpec:
+  kubernetes.datatypes.ServiceSpec:
     derived_from: kubernetes.datatypes.Root
     properties:
       clusterIP:
@@ -58,7 +58,6 @@ data_types:
         entry_schema:
           type: string
         required: false
-
       ports:
         description: externalIPs is a list of IP addresses for which nodes in the cluster will also accept traffic for this service. These IPs are not managed by Kubernetes. The user is responsible for ensuring that traffic arrives at a node with this IP. A common example is external load-balancers that are not part of the Kubernetes system.
         type: list
@@ -77,11 +76,11 @@ data_types:
         description: The port that will be exposed by this service.
         type: integer
         required: false
-      targetPort:
-        description: Number or name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field.
-        type: integer
         constraints:
           - in_range: [1, 65535]
+      targetPort:
+        description: Name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field.
+        type: string
         required: false
 
   kubernetes.datatypes.PodSpec:
