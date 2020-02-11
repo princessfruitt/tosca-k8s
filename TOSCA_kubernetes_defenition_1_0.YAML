@@ -3,7 +3,7 @@ tosca_definitions_version: tosca_simple_yaml_1_0
 node_types:
   kubernetes.nodes.Root:
     derived_from: tosca.nodes.Root
-  kubernetes.node.Deployment:
+  kubernetes.nodes.Deployment:
     derived_from: kubernetes.nodes.Root
     properties:
       metadata:
@@ -13,7 +13,7 @@ node_types:
       spec:
         type: kubernetes.datatypes.DeploymentSpec
         required: false
-  kubernetes.node.Pod:
+  kubernetes.nodes.Pod:
     derived_from: kubernetes.nodes.Root
     properties:
       metadata:
@@ -23,7 +23,7 @@ node_types:
       spec:
         type: kubernetes.datatypes.PodSpec
         required: false
-  kubernetes.node.Service:
+  kubernetes.nodes.Service:
     derived_from: kubernetes.nodes.Root
     properties:
       metadata:
@@ -38,12 +38,16 @@ data_types:
 
   kubernetes.datatypes.Root:
     derived_from: tosca.datatypes.Root
+    
   kubernetes.datatypes.ObjectMeta:
     derived_from: kubernetes.datatypes.Root
     properties:
       label:
         type: map
         required: false
+       name:
+        type: string
+        required: true
 
   kubernetes.datatypes.ServiceSpec:
     derived_from: kubernetes.datatypes.Root
@@ -64,6 +68,10 @@ data_types:
         entry_schema:
           type: kubernetes.datatypes.ServicePort
         required: false
+      selector:
+        description: Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify. 
+        type: string
+        required: false
 
   kubernetes.datatypes.ServicePort:
     derived_from:  kubernetes.datatypes.Root
@@ -72,14 +80,15 @@ data_types:
         description: The name of this port within the service. This must be a DNS_LABEL. All ports within a ServiceSpec must have unique names. When considering the endpoints for a Service, this must match the 'name' field in the EndpointPort. Optional if only one ServicePort is defined on this service.
         type: string
         required: false
-      port:
-        description: The port that will be exposed by this service.
-        type: integer
-        required: false
+      protocol:
+        description: The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP.
+        type: string
+        default: TCP
         constraints:
-          - in_range: [1, 65535]
+          - valid_values: [TCP, UDP, SCTP]
+        required: false
       targetPort:
-        description: Name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field.
+        description: Name of the port to access on the pods targeted by the service.Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field.
         type: string
         required: false
 
@@ -158,7 +167,7 @@ data_types:
         type: string
         default: RollingUpdate
         constraints:
-          - RollingUpdate
+          - valid_values: [RollingUpdate]
       rollingUpdate:
         description: Rolling update config params. Present only if DeploymentStrategyType = RollingUpdate.
         type: kubernetes.datatypes.RollingUpdateDeployment
