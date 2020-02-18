@@ -71,7 +71,7 @@ data_types:
       selector:
         description: Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify. 
         type: string
-        required: false
+        required: true
 
   kubernetes.datatypes.ServicePort:
     derived_from:  kubernetes.datatypes.Root
