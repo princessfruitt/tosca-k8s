@@ -3,36 +3,25 @@ topology_template:
 
   node_templates:
     deployment:
-      type: tosca.nodes.Compute
+      type: tosca.nodes.Compute 
+      private_address: 10.0.171.239
+      public_address: 80.11.12.10
       capabilities:
         scalable:
           properties:
-            min_instances: 1
-            max_instances: 12
-      requirements:
-        - dependency: service
-        - dependency: pod
-
-    service:
-      type: tosca.nodes.Compute
-      attributes:
-        private_address: 10.0.171.239
-        public_address: 80.11.12.10
+            default_instances: 1
         ports:
-          - port_name: http
-            port_id: 80
-            addresses: 9376
-
-    pod:
-      type: tosca.nodes.Compute
-      capabilities:
+          - port_name: my-pods
         host:
           properties:
             num_cpus: 2
             cpu_frequency: 0.1 GHz
-            disk_size: 1 GB
+            disk_size: 500 MB
             mem_size: 250MB
         os:
           properties:
-            type: nginx
+            type: polinux
             distribution: stress
+            version: v1
+        endpoint:
+          protocol: tcp
