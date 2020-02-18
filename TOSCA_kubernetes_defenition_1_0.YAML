@@ -1,5 +1,12 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
+metadata:
+  template_name: Kubernetes definition
+  template_author: Borisova Alexandra
+  template_version: v1 
+
+description: Tosca template for kubernetes
+
 node_types:
   kubernetes.nodes.Root:
     derived_from: tosca.nodes.Root
@@ -13,6 +20,7 @@ node_types:
       spec:
         type: kubernetes.datatypes.DeploymentSpec
         required: false
+
   kubernetes.nodes.Pod:
     derived_from: kubernetes.nodes.Root
     properties:
@@ -23,6 +31,7 @@ node_types:
       spec:
         type: kubernetes.datatypes.PodSpec
         required: false
+
   kubernetes.nodes.Service:
     derived_from: kubernetes.nodes.Root
     properties:
@@ -45,7 +54,7 @@ data_types:
       label:
         type: map
         required: false
-       name:
+      name:
         type: string
         required: true
 
@@ -147,10 +156,6 @@ data_types:
   kubernetes.datatypes.DeploymentSpec:
     derived_from: kubernetes.datatypes.Root
     properties:
-      strategy:
-        description: The deployment strategy to use to replace existing pods with new ones.
-        type: kubernetes.datatypes.DeploymentStrategy
-        required: false
       replicas:
         description: Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
         type: integer
@@ -158,33 +163,3 @@ data_types:
         default: 1
         constraints:
           - greater_or_equal: 0
-
-  kubernetes.datatypes.DeploymentStrategy:
-    derived_from:  kubernetes.datatypes.Root
-    properties:
-      type:
-        description: Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
-        type: string
-        default: RollingUpdate
-        constraints:
-          - valid_values: [RollingUpdate]
-      rollingUpdate:
-        description: Rolling update config params. Present only if DeploymentStrategyType = RollingUpdate.
-        type: kubernetes.datatypes.RollingUpdateDeployment
-        required: true
-
-  kubernetes.datatypes.RollingUpdateDeployment:
-    derived_from:  kubernetes.datatypes.Root
-    properties:
-      maxUnavailable:
-        description: The maximum number of pods that can be unavailable during the update.
-        type: integer
-        required: false
-        constraints:
-          - greater_or_equal: 1
-      maxSurge:
-        description: The maximum number of pods that can be scheduled above the desired number of pods.
-        type: integer
-        required: false
-        constraints:
-          - greater_or_equal: 1
