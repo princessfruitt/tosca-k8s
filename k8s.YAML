@@ -1,19 +1,15 @@
 apiVersion: v1
 kind: Deployment
 spec:
-  strategy:
-    type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: 25%
-        maxSurge: 1
+  replicas: 3
 kind: Pod
 spec:
   containers:
-    image: polinux/stress
+    image: polinux/stress:vi
     resources:
       limits:
-        cpu: "0,2"
-        memory: "1gb"
+        cpu: "0.1 GHz"
+        memory: "500 MB"
   args:
     ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
     - -cpus
@@ -21,9 +17,7 @@ spec:
 kind: Service
 spec:
   clusterIP: 10.0.171.239
-  externalIP:
-    - 80.11.12.10
+  externalIP: 80.11.12.10
   ports:
-    - name: http
-      port: 80
-      targetPort: 9376
+    - protocol: TCP
+      targetPort: my-pods
