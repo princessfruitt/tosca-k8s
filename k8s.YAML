@@ -33,7 +33,6 @@ spec:
   externalIPs: 10.43.222.100
   ports:
   - nodePort: 30216
-    port: 80
     protocol: TCP
     targetPort: test-ports
   selector:
