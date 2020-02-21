@@ -10,40 +10,16 @@ description: Tosca definition for kubernetes
 node_types:
   kubernetes.nodes.Root:
     derived_from: tosca.nodes.Root
-  kubernetes.nodes.KubeObj:
+  kubernetes.nodes.Deployment:
     derived_from: kubernetes.nodes.Root
     properties:
-      kind: 
-        description: Cannot be updated. In CamelCase. Containers are only ever created within the context of a Pod. This is usually done using a Controllers(Deployment,StatefulSet)
-        type: string
-        default: Deployment
-        constraints:
-          - valid_values: [Deployment]
-        required: false
-      replicas:
-        description: Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
-        type: integer
-        required: false
-        default: 1
-        constraints:
-          - greater_or_equal: 0
-      selector:
-        description: Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. It must match the pod template's labels.
-        type: kubernetes.datatypes.LabelSelector
-        required: false
-      template:
-        type: list
-        enty_schema: 
-          type: kubernetes.datatypes.Pod
+      spec:
+        type: kubernetes.datatypes.DeploymentSpec
         required: false
 
   kubernetes.nodes.Service:
     derived_from: kubernetes.nodes.Root
     properties:
-      metadata:
-        description: Standard object's metadata.
-        type: kubernetes.datatypes.Metadata
-        required: false
       spec:
         type: kubernetes.datatypes.ServiceSpec
         required: false
@@ -85,11 +61,11 @@ data_types:
       metadata:
         description: Standard object's metadata.
         type: kubernetes.datatypes.Metadata
-        required: false
+        required: true
       spec:
         description: Specification of the desired behavior of the pod.
         type: kubernetes.datatypes.PodSpec
-        required: false
+        required: true
 
   kubernetes.datatypes.PodSpec:
     derived_from: kubernetes.datatypes.Root
@@ -97,7 +73,7 @@ data_types:
       containers:
         description: List of containers belonging to the pod. Containers cannot currently be added or removed. There must be at least one container in a Pod. Cannot be updated.
         type: kubernetes.datatypes.Container
-        required: false
+        required: true
 
   kubernetes.datatypes.Container:
     derived_from:  kubernetes.datatypes.Root
@@ -110,7 +86,7 @@ data_types:
         type: string
 #        constraints:
 #          - pattern: (?<image>.*)\/(?<distribution>.*)\:(?<version>.*)
-        required: false
+        required: true
       resources:
         description: Compute Resources required by this container. Cannot be updated.
         type: kubernetes.datatypes.ResourceRequirements
@@ -144,7 +120,25 @@ data_types:
         type:  scalar-unit.size
         required: false
         constraints:
-          - greater_or_equal: 0 MB
+          - greater_or_equal: 1  MB
+
+  kubernetes.datatypes.DeploymentSpec:
+    derived_from: kubernetes.nodes.Root
+    properties:
+      replicas:
+        description: Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
+        type: integer
+        required: false
+        default: 1
+        constraints:
+          - greater_or_equal: 0
+      selector:
+        description: Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. It must match the pod template's labels.
+        type: kubernetes.datatypes.LabelSelector
+        required: true
+      template: 
+          type: kubernetes.datatypes.Pod
+          required: true
 
   kubernetes.datatypes.ServiceSpec:
     derived_from: kubernetes.datatypes.Root
@@ -164,11 +158,18 @@ data_types:
         type: list
         entry_schema:
           type: kubernetes.datatypes.ServicePort
+        required: true
+      type: 
+        description: NodePort builds on ClusterIP and allocates a port on every node which routes to the clusterIP.
+        type: string
+        default: NodePort
+        constraints:
+          - valid_values: [NodePort]
         required: false
       selector:
         description: Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify. 
         type: string
-        required: false
+        required: true
 
   kubernetes.datatypes.ServicePort:
     derived_from:  kubernetes.datatypes.Root
@@ -183,4 +184,8 @@ data_types:
       targetPort:
         description: Name of the port to access on the pods targeted by the service.Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field.
         type: string
+        required: true
+      nodePort:
+        description: he port on each node on which this service is exposed when type=NodePort or LoadBalancer. 
+        type: integer
         required: false
