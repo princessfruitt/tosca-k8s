@@ -4,24 +4,29 @@ topology_template:
   node_templates:
     deployment:
       type: tosca.nodes.Compute 
-      private_address: 10.0.171.239
-      public_address: 80.11.12.10
       capabilities:
         scalable:
           properties:
-            default_instances: 1
-        ports:
-          - port_name: my-pods
+            default_instances: 3
         host:
           properties:
             num_cpus: 2
             cpu_frequency: 0.1 GHz
-            disk_size: 500 MB
+            disk_size: 100 MB
             mem_size: 250MB
         os:
           properties:
-            type: polinux
-            distribution: stress
-            version: v1
-        endpoint:
-          protocol: tcp
+            type: ubuntu
+            distribution: xenial
+     service:
+        type:  tosca.nodes.Compute 
+        properties:
+          private_address: 10.0.171.239
+          public_address: 80.11.12.10
+          capabilities:
+            endpoint:
+              properties:
+                protocol: tcp
+                port: 30216
+                port_name: test-ports
+      
