@@ -19,7 +19,7 @@ spec:
           - name: test-ports
         resources:
           limits:
-            cpu: 100m
+            cpu: 0.1
             memory: 100Mi
         args:
           ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
@@ -29,8 +29,8 @@ spec:
       os: ubuntu
 kind: Service
 spec:
-  clusterIP: 10.43.222.100
-  externalIPs: 10.43.222.100
+  clusterIP: 10.0.171.239
+  externalIPs: 80.11.12.10
   ports:
   - nodePort: 30216
     protocol: TCP
