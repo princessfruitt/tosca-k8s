@@ -24,6 +24,7 @@ spec:
           - "2"
   selector: 
       os: ubuntu
+apiVersion: v1
 kind: Service
 spec:
   clusterIP: 10.0.171.239
