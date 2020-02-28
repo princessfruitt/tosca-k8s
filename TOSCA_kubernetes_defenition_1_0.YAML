@@ -1,4 +1,4 @@
-tosca_definitions_version: tosca_simple_yaml_1_2
+tosca_definitions_version: tosca_simple_yaml_1_0
 
 metadata:
   template_name: Kubernetes definition
@@ -34,6 +34,10 @@ node_types:
         type: string
         default: apps
         required: true
+      metadata:
+        description: Standard object's metadata.
+        type: kubernetes.datatypes.ObjectMeta
+        required: false
       spec:
         type: kubernetes.datatypes.DeploymentSpec
         required: true
@@ -41,6 +45,10 @@ node_types:
   kubernetes.nodes.Service:
     derived_from: kubernetes.nodes.Root
     properties:
+      metadata:
+        description: Standard object's metadata.
+        type: kubernetes.datatypes.ObjectMeta
+        required: false
       spec:
         type: kubernetes.datatypes.ServiceSpec
         required: true

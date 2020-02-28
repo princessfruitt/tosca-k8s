@@ -5,9 +5,12 @@ imports:
 
 topology_template:
     node_templates:
-      deployment:
+      app_deployment:
         type:  kubernetes.nodes.Deployment
         properties:
+          metadata:
+            labels:
+              name: app-deployment
           spec:
             replicas: 3
             selector:
@@ -25,7 +28,7 @@ topology_template:
                   resources:
                     limits:
                       memory: 100 MB
-      service:
+      app_service:
         type:  kubernetes.nodes.Service
         properties:
           spec:
