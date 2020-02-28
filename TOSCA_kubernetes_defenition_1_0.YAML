@@ -8,22 +8,50 @@ metadata:
 description: Tosca definition for kubernetes
 
 node_types:
+
   kubernetes.nodes.Root:
     derived_from: tosca.nodes.Root
+    properties:
+      apiVersion:
+        type: string
+        default: v1
+        constraints:
+          - valid_values: [v1, v1alpha1, v2alpha1, v1beta1, v1beta2, v2beta1, v2beta2]
+        required: true
+      apiGroup:
+        description: Along with the version is exposed in the "apiVersion" field as "GROUP/VERSION", e.g. "policy.k8s.io/v1".
+        type: string
+        default: core
+        required: true
+        constraints:
+          - valid_values: [core, apps, batch]
+
 
   kubernetes.nodes.Deployment:
     derived_from: kubernetes.nodes.Root
     properties:
+      apiGroup:
+        type: string
+        default: apps
+        required: true
+      metadata:
+        description: Standard object's metadata.
+        type: kubernetes.datatypes.ObjectMeta
+        required: false
       spec:
         type: kubernetes.datatypes.DeploymentSpec
-        required: false
+        required: true
 
   kubernetes.nodes.Service:
     derived_from: kubernetes.nodes.Root
     properties:
+      metadata:
+        description: Standard object's metadata.
+        type: kubernetes.datatypes.ObjectMeta
+        required: false
       spec:
         type: kubernetes.datatypes.ServiceSpec
-        required: false
+        required: true
 
 data_types:
 
@@ -60,7 +88,7 @@ data_types:
         required: false
 
   kubernetes.datatypes.Pod:
-    derived_from: kubernetes.nodes.Root
+    derived_from: kubernetes.datatypes.Root
     properties:
       metadata:
         description: Standard object's metadata.
@@ -88,8 +116,8 @@ data_types:
       image:
         description: Docker image name. More info https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.
         type: string
-#        constraints:
-#          - pattern: (?<image>.*)\/(?<distribution>.*)\:(?<version>.*)
+        constraints:
+          - pattern: (.*)\/?(.*)\:(.*)
         required: false
       ports:
         type: list
@@ -128,10 +156,10 @@ data_types:
     properties:
       cpu:
         description: The CPU resource is measured in cpus.
-        type: scalar-unit.frequency
+        type: float
         required: false
         constraints:
-          - greater_or_equal: 0.1 GHz
+          -  in_range: [0,1]
       memory:
         description: The RAM resource is measured in bytes.
         type:  scalar-unit.size
@@ -140,7 +168,7 @@ data_types:
           - greater_or_equal: 1  MB
 
   kubernetes.datatypes.DeploymentSpec:
-    derived_from: kubernetes.nodes.Root
+    derived_from: kubernetes.datatypes.Root
     properties:
       replicas:
         description: Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.

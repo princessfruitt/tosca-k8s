@@ -1,13 +1,16 @@
-tosca_definitions_version: tosca_simple_yaml_1_0
+﻿tosca_definitions_version: tosca_simple_yaml_1_0
 
 imports:
   - TOSCA_kubernetes_defenition_1_0.YAML
-  
+
 topology_template:
     node_templates:
-      deployment:
+      app_deployment:
         type:  kubernetes.nodes.Deployment
         properties:
+          metadata:
+            labels:
+              name: app-deployment
           spec:
             replicas: 3
             selector:
@@ -24,9 +27,8 @@ topology_template:
                     - name: test-ports
                   resources:
                     limits:
-                      cpu:  0.1 GHz
                       memory: 100 MB
-      service:
+      app_service:
         type:  kubernetes.nodes.Service
         properties:
           spec:
