@@ -1,0 +1,77 @@
+"tosca.nodes.Compute":
+  - parameter: "kubernetes.nodes.Deployment.properties.metadata.name"
+    value: "{self[name]}"
+  - attributes:
+      private_address: "kubernetes.nodes.Service.properties.spec.clusterIP"
+      public_address: "kubernetes.nodes.Service.properties.spec.externalIPs"
+    networks:
+      error: true
+      reason: "networks not supported in Kubernetes"
+    ports:
+      error: true
+      reason: "ports not supported in Kubernetes"
+    capabilities:
+      host.properties:
+        num_cpus:
+          parameter: "kubernetes.nodes.Deployment.properties.spec"
+          value:
+            parameter: "kubernetes.datatypes.ServiceSpec.properties.clusterIP"
+            value: "{self[value]}"
+        cpu_frequency:
+          error: true
+          reason: "cpu_frequency not supported in Kubernetes"
+        disk_size:
+          error: true
+          reason: "disk_size not supported in Kubernetes"
+        mem_size: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers.resources.limits.memory"
+      endpoint.properties:
+        protocol:
+          parameter: "kubernetes.nodes.Service.properties.spec.ports"
+          value:
+            - parameter: protocol
+              value: "{self[value]}"
+        port:
+          parameter: "kubernetes.nodes.Service.properties.spec.ports"
+          value:
+            - parameter: nodePort
+              value: "{self[value]}"
+        port_name:
+          parameter: "kubernetes.nodes.Service.properties.spec.ports"
+          value:
+            - parameter: targetPort
+              value: "{self[value]}"
+        secure:
+          error: true
+          reason: "secure not supported in Kubernetes"
+        url_path:
+          error: true
+          reason: "url_path not supported in Kubernetes"
+        network_name:
+          error: true
+          reason: "network_name not supported in Kubernetes"
+        initiator:
+          error: true
+          reason: "initiator not supported in Kubernetes"
+        ports:
+          error: true
+          reason: "ports not supported in Kubernetes"
+      os.properties:
+        - architecture:
+            error: true
+            reason: "not supported in Kubernetes"
+          type:
+            parameter: "{self[buffer][image]}"
+            value: "{self[value]}"
+          distribution:
+            parameter: "{self[buffer][image]}"
+            value: "{self[value]}"
+          version:
+            parameter: "{self[buffer][tag]}"
+            value: ":{self[value]}"
+        - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers.image"
+          value: "{self[buffer][image]}{self[buffer][tag]}"
+      scalable.properties:
+        max_instances:
+          error: true
+          reason: "max_instances not supported in Kubernetes"
+        min_instances: "kubernetes.nodes.Deployment.properties.spec.replicas"
