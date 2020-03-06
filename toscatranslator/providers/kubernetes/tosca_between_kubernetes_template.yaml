@@ -14,17 +14,24 @@ node_templates:
               app: testApp
           spec:
             containers:
-            - ports:
-              - name: testApp-ports
+            - name:  testapp-container
+              ports:
+              - name: test-ports
+                containerPort: 888
+              image: ubuntu:xenial
+              resourses:
+                limits:
+                  memory: 10Mi
     type: kubernetes.nodes.Deployment
   testApp_service:
     properties:
       spec:
-        clusterIP: 10.0.171.239
-        externalIPs: 80.11.12.10
+        clusterIP: 10.233.0.2
+        externalIPs: '[80.11.12.10]'
         ports:
-        - targetPort: testApp-ports
+        - targetPort: test-ports
+          port: 888
+           protocol: tcp
         selector:
-          matchLabels:
-            app: testApp
+          app: testApp
     type: kubernetes.nodes.Service

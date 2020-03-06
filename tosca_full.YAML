@@ -5,7 +5,7 @@ topology_template:
     app:
       type: tosca.nodes.Compute
       attributes:
-        private_address: 10.0.171.239
+        private_address: 10.233.0.2
         public_address: 80.11.12.10
       capabilities:
         scalable:
@@ -14,8 +14,7 @@ topology_template:
         host:
           properties:
             num_cpus: 2
-            cpu_frequency: 0.1 GHz
-            disk_size: 100 MB
+            disk_size: 10 MB
             mem_size: 250MB
         os:
           properties:
@@ -24,5 +23,5 @@ topology_template:
         endpoint:
           properties:
             protocol: tcp
-            port: 30216
+            port: 888
             port_name: test-ports

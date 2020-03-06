@@ -21,60 +21,58 @@
         disk_size:
           error: true
           reason: "disk_size not supported in Kubernetes"
-#        mem_size:
-#          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
-#            value:
-#              - paraneter: resources
-#                value:
-#                  paraneter: limits.memory
-#                  value: "{self[value]}"
+        mem_size:
+          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+            value:
+              - parameter: resources.limits.memory
+                value: "{self[value]}"
 
       endpoint.properties:
-        protocol:
-          parameter: "kubernetes.nodes.Service.properties.spec.ports"
+        - parameter: "kubernetes.nodes.Service.properties.spec.selector"
           value:
-            - parameter: protocol
-              value: "{self[value]}"
-        port:
-          - parameter: "kubernetes.nodes.Service.properties.spec.ports"
+            app: "{self[name]}"
+        - protocol:
+            parameter: "kubernetes.nodes.Service.properties.spec.ports"
             value:
-              - parameter: nodePort
+              - parameter: protocol
                 value: "{self[value]}"
-          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
-            value:
-            - parameter: ports
+          port:
+            - parameter: "kubernetes.nodes.Service.properties.spec.ports"
               value:
-                - parameter: containerPort
+                - parameter: port
                   value: "{self[value]}"
-        port_name:
-          - parameter: "kubernetes.nodes.Service.properties.spec.ports"
-            value:
-              - parameter: targetPort
-                value: "{self[name]}-ports"
-          - parameter: "kubernetes.nodes.Service.properties.spec.selector.matchLabels"
-            value:
-              app: "{self[name]}"
-          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
-            value:
-              - parameter: ports
-                value:
-                  - parameter: name
-                    value: "{self[name]}-ports"
-        secure:
-          error: true
-          reason: "secure not supported in Kubernetes"
-        url_path:
-          error: true
-          reason: "url_path not supported in Kubernetes"
-        network_name:
-          error: true
-          reason: "network_name not supported in Kubernetes"
-        initiator:
-          error: true
-          reason: "initiator not supported in Kubernetes"
-        ports:
-          error: true
-          reason: "ports not supported in Kubernetes"
+            - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+              value:
+                - parameter: ports
+                  value:
+                    - parameter: containerPort
+                      value: "{self[value]}"
+          port_name:
+            - parameter: "kubernetes.nodes.Service.properties.spec.ports"
+              value:
+                - parameter: targetPort
+                  value: "{self[value]}"
+            - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+              value:
+                - parameter: ports
+                  value:
+                    - parameter: name
+                      value: "{self[value]}"
+          secure:
+            error: true
+            reason: "secure not supported in Kubernetes"
+          url_path:
+            error: true
+            reason: "url_path not supported in Kubernetes"
+          network_name:
+            error: true
+            reason: "network_name not supported in Kubernetes"
+          initiator:
+            error: true
+            reason: "initiator not supported in Kubernetes"
+          ports:
+            error: true
+            reason: "ports not supported in Kubernetes"
       os.properties:
         - architecture:
             error: true

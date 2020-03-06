@@ -227,13 +227,6 @@ data_types:
         entry_schema:
           type: kubernetes.datatypes.ServicePort
         required: false
-      type:
-        description: NodePort builds on ClusterIP and allocates a port on every node which routes to the clusterIP.
-        type: string
-        default: NodePort
-        constraints:
-          - valid_values: [NodePort]
-        required: true
       selector:
         description: Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify.
         type: kubernetes.datatypes.LabelSelector
