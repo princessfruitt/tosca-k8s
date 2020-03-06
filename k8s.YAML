@@ -3,20 +3,25 @@ kind: List
 items:
 - apiVersion: apps/v1
   kind: Deployment
+  metadata:
+    name: testApp-deployment
   spec:
     replicas: 3
     selector:
       matchLabels:
-        os: ubuntu
+        app: testApp
     template:
       metadata:
         labels:
-          os: ubuntu
+          app: testApp
       spec:
         containers:
-        - image: ubuntu:xenial
+        - name: testApp-container
+          image: ubuntu:xenial
+          command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
           ports:
-            - name: test-ports
+            - name: testApp-ports
+              containerPort:
           resources:
             limits:
               cpu: 0.1
@@ -25,8 +30,6 @@ items:
             ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
             - -cpus
             - "2"
-    selector: 
-        os: ubuntu
 - apiVersion: v1
   kind: Service
   spec:
@@ -37,5 +40,6 @@ items:
       protocol: TCP
       targetPort: test-ports
     selector:
-      os: ubuntu
+      matchLabels:
+        app: testApp
     type: NodePort

@@ -48,8 +48,8 @@ node_types:
         required: true
       metadata:
         description: Standard object's metadata.
-        type: kubernetes.datatypes.ObjectMeta
-        required: false
+        type: kubernetes.datatypes.ObjectMeta.name
+        required: true
       spec:
         type: kubernetes.datatypes.DeploymentSpec
         required: true
@@ -102,36 +102,36 @@ data_types:
           type: string
           constraints:
             - max_length: 128
-        required: false
+        required: true
 
   kubernetes.datatypes.Pod:
     derived_from: kubernetes.datatypes.Root
     properties:
       metadata:
         description: Standard object's metadata.
-        type: kubernetes.datatypes.ObjectMeta
-        required: false
+        type: kubernetes.datatypes.ObjectMeta.labels
+        required: true
       spec:
         description: Specification of the desired behavior of the pod.
         type: kubernetes.datatypes.PodSpec
-        required: false
+        required: true
 
   kubernetes.datatypes.Container:
     derived_from:  kubernetes.datatypes.Root
     properties:
       name:
         type: string
-        required: false
+        required: true
       image:
         description: Docker image name. More info https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.
         type: string
         constraints:
           - pattern: (.*)\/?(.*)\:(.*)
-        required: false
+        required: true
       ports:
         type: list
         enty_schema:
-          type: kubernetes.datatypes.Port
+          type: kubernetes.datatypes.ContainerPort
         required: false
       resources:
         description: Compute Resources required by this container. Cannot be updated.
@@ -149,16 +149,22 @@ data_types:
     properties:
       containers:
         description: List of containers belonging to the pod. Containers cannot currently be added or removed. There must be at least one container in a Pod. Cannot be updated.
-        type: kubernetes.datatypes.Container
-        required: false
+        type: list
+        entry_schema:
+          type: kubernetes.datatypes.Container
+        required: true
 
-  kubernetes.datatypes.Port:
+  kubernetes.datatypes.ContainerPort:
     derived_from:  kubernetes.datatypes.Root
     properties:
       name:
-        description: The name of this port within the service.
+        description: If specified, this must be an IANA_SVC_NAME and unique within the pod. Each named port in a pod must have a unique name. Name for the port that can be referred to by services.
         type: string
         required: false
+      containerPort:
+        description: Number of port to expose on the pod's IP address. This must be a valid port number, 0 < x < 65536
+        type: integer
+        required: true
 
   kubernetes.datatypes.ResourceRequirements:
     derived_from:  kubernetes.datatypes.Root
@@ -197,7 +203,7 @@ data_types:
       selector:
         description: Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. It must match the pod template's labels.
         type: kubernetes.datatypes.LabelSelector
-        required: false
+        required: true
       template:
         type: kubernetes.datatypes.Pod
         required: false
@@ -227,7 +233,7 @@ data_types:
         default: NodePort
         constraints:
           - valid_values: [NodePort]
-        required: false
+        required: true
       selector:
         description: Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify.
         type: kubernetes.datatypes.LabelSelector

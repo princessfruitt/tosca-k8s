@@ -1,0 +1,30 @@
+node_templates:
+  testApp_deployment:
+    properties:
+      metadata:
+        name: testApp-deployment
+      spec:
+        replicas: 3
+        selector:
+          matchLabels:
+            app: testApp
+        template:
+          metadata:
+            labels:
+              app: testApp
+          spec:
+            containers:
+            - ports:
+              - name: testApp-ports
+    type: kubernetes.nodes.Deployment
+  testApp_service:
+    properties:
+      spec:
+        clusterIP: 10.0.171.239
+        externalIPs: 80.11.12.10
+        ports:
+        - targetPort: testApp-ports
+        selector:
+          matchLabels:
+            app: testApp
+    type: kubernetes.nodes.Service

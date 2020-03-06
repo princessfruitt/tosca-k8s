@@ -1,6 +1,4 @@
 "tosca.nodes.Compute":
-  - parameter: "kubernetes.nodes.Deployment.properties.metadata.name"
-    value: "{self[name]}"
   - attributes:
       private_address: "kubernetes.nodes.Service.properties.spec.clusterIP"
       public_address: "kubernetes.nodes.Service.properties.spec.externalIPs"
@@ -23,7 +21,14 @@
         disk_size:
           error: true
           reason: "disk_size not supported in Kubernetes"
-        mem_size: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers.resources.limits.memory"
+#        mem_size:
+#          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+#            value:
+#              - paraneter: resources
+#                value:
+#                  paraneter: limits.memory
+#                  value: "{self[value]}"
+
       endpoint.properties:
         protocol:
           parameter: "kubernetes.nodes.Service.properties.spec.ports"
@@ -31,15 +36,30 @@
             - parameter: protocol
               value: "{self[value]}"
         port:
-          parameter: "kubernetes.nodes.Service.properties.spec.ports"
-          value:
-            - parameter: nodePort
-              value: "{self[value]}"
+          - parameter: "kubernetes.nodes.Service.properties.spec.ports"
+            value:
+              - parameter: nodePort
+                value: "{self[value]}"
+          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+            value:
+            - parameter: ports
+              value:
+                - parameter: containerPort
+                  value: "{self[value]}"
         port_name:
-          parameter: "kubernetes.nodes.Service.properties.spec.ports"
-          value:
-            - parameter: targetPort
-              value: "{self[value]}"
+          - parameter: "kubernetes.nodes.Service.properties.spec.ports"
+            value:
+              - parameter: targetPort
+                value: "{self[name]}-ports"
+          - parameter: "kubernetes.nodes.Service.properties.spec.selector.matchLabels"
+            value:
+              app: "{self[name]}"
+          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+            value:
+              - parameter: ports
+                value:
+                  - parameter: name
+                    value: "{self[name]}-ports"
         secure:
           error: true
           reason: "secure not supported in Kubernetes"
@@ -68,8 +88,22 @@
           version:
             parameter: "{self[buffer][tag]}"
             value: ":{self[value]}"
-        - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers.image"
-          value: "{self[buffer][image]}{self[buffer][tag]}"
+        - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+          value:
+            - parameter: image
+              value: "{self[buffer][image]}{self[buffer][tag]}"
+        - parameter: "kubernetes.nodes.Deployment.properties.metadata.name"
+          value: "{self[name]}-deployment"
+        - parameter: "kubernetes.nodes.Deployment.properties.spec.selector.matchLabels"
+          value:
+            app: "{self[name]}"
+        - parameter: "kubernetes.nodes.Deployment.properties.spec.template.metadata.labels"
+          value:
+            app: "{self[name]}"
+        - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+          value:
+            - parameter: name
+              value: "{self[name]}-container"
       scalable.properties:
         max_instances:
           error: true
