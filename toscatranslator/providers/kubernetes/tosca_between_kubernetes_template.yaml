@@ -1,0 +1,37 @@
+node_templates:
+  testApp_deployment:
+    properties:
+      metadata:
+        name: testApp-deployment
+      spec:
+        replicas: 3
+        selector:
+          matchLabels:
+            app: testApp
+        template:
+          metadata:
+            labels:
+              app: testApp
+          spec:
+            containers:
+            - name:  testapp-container
+              ports:
+              - name: test-ports
+                containerPort: 888
+              image: ubuntu:xenial
+              resourses:
+                limits:
+                  memory: 10Mi
+    type: kubernetes.nodes.Deployment
+  testApp_service:
+    properties:
+      spec:
+        clusterIP: 10.233.0.2
+        externalIPs: '[80.11.12.10]'
+        ports:
+        - targetPort: test-ports
+          port: 888
+           protocol: tcp
+        selector:
+          app: testApp
+    type: kubernetes.nodes.Service
