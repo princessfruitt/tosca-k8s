@@ -11,10 +11,11 @@
     capabilities:
       host.properties:
         num_cpus:
-          parameter: "kubernetes.nodes.Deployment.properties.spec"
-          value:
-            parameter: "kubernetes.datatypes.ServiceSpec.properties.clusterIP"
-            value: "{self[value]}"
+          - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
+                value:
+                  - parameter: args
+                    value: "{self[value]}"
+                            
         cpu_frequency:
           error: true
           reason: "cpu_frequency not supported in Kubernetes"
@@ -23,9 +24,13 @@
           reason: "disk_size not supported in Kubernetes"
         mem_size:
           - parameter: "kubernetes.nodes.Deployment.properties.spec.template.spec.containers"
-            value:
-              - parameter: resources.limits.memory
-                value: "{self[value]}"
+                value:
+                  - parameter: resources
+                    value:
+                      - parameter: limits
+                        value:
+                          - parameter: memory
+                            value: "{self[value]}"
 
       endpoint.properties:
         - parameter: "kubernetes.nodes.Service.properties.spec.selector"
